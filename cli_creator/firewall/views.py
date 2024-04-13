@@ -13,8 +13,9 @@ def forticli(request):
         des_add = request.query_params.get('des_add')
         tcp_port = request.query_params.get('tcp_port')
         udp_port = request.query_params.get('udp_port')
-        print(name, src_if, des_if, src_add, des_add, tcp_port, udp_port)
-        config = FirewallConfigurator(name, src_if, des_if, src_add, des_add, tcp_port, udp_port)
+        log = request.query_params.get('log')
+        print(name, src_if, des_if, src_add, des_add, tcp_port, udp_port, log)
+        config = FirewallConfigurator(name, src_if, des_if, src_add, des_add, tcp_port, udp_port, log)
         result_command = config.configure_address() + config.configre_port() + config.configure_policy()
         result_command_str = str(result_command)
 
