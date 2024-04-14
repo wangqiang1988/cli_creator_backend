@@ -20,11 +20,14 @@ class FirewallConfigurator:
     # 计算子网掩码的四个字节
         mask = [0, 0, 0, 0]
         for i in range(prefix_length // 8):
+            print(i)
             mask[i] = 255
+            print(mask)
         remaining_bits = prefix_length % 8
+        print(remaining_bits)
         if remaining_bits > 0:
             mask[prefix_length // 8] = 256 - (1 << (8 - remaining_bits))
-
+            print(mask)
     # 将子网掩码转换为字符串形式
         mask_str = '.'.join(map(str, mask))
 
@@ -132,17 +135,62 @@ class FirewallConfigurator:
         end = "end"
         command += name + '\n' + srcintf + '\n' + dstintf + '\n' + srcaddr + '\n' + dstaddr + '\n' + schedule + '\n' + service + '\n' + logtraffic + '\n' + action + '\n' + status + '\n' + end
         return command
+    
+    def configure_policy_modify(self, policy_id, select):
+        command = "config firewall policy\n" + "edit %s\n"% policy_id
+        src_address_str = ""
+        des_address_str = ""
+        tcp_port_str = ""
+        udp_port_str = ""
+        for i in self.src_address.split(','):
+            if i == "all":
+                src_address_str += "all"
+            elif '/' in i:
+                src_address_str += i + " "
+            else:
+                src_address_str += i + "/32 "
+        for j in self.des_address.split(','):
+            if j == "all":
+                des_address_str += 'all'
+            elif '/' in j:
+                des_address_str += j + " "
+            elif j == "":
+                pass
+            else:
+                des_address_str += j + "/32 "
+        for k in self.tcp_port.split(','):
+            if k == "all":
+                tcp_port_str += "ALL_TCP "
+            elif k == "icmp":
+                tcp_port_str += "ALL_ICMP "
+            elif k == "":
+                pass
+            else:
+                tcp_port_str += "TCP-%s " %k
+        for l in self.udp_port.split(','):
+            if l == "all":
+                udp_port_str += "ALL_UDP "
+            elif l == "":
+                pass
+            else:
+                udp_port_str += "UDP-%s " %l
+        srcaddr = "%s srcaddr %s" % (select, src_address_str)
+        dstaddr = "%s dstaddr %s" % (select, des_address_str)
+        service = "%s service %s" % (select, tcp_port_str + udp_port_str)
+        end = "end"
+        command += srcaddr + '\n' + dstaddr + '\n' + service + '\n' + end
+        return command
 
 if __name__ == '__main__':
     src_if = "x1"
     des_if = "x2"
-    src_add = "192.168.1.1,192.168.1.2,10.1.1.0/24"
-    des_add = "1.1.1.1/32"
-    tcp_port = "ALL"
-    udp_port = "ALL"
+    src_add = "2.2.2.1,2.2.2.4/25"
+    des_add = "2.2.2.2,2.2.2.3"
+    tcp_port = "55"
+    udp_port = "56"
     log = "all"
     name_input = input("policy_name:")
     firewall = FirewallConfigurator(name_input,src_if,des_if,src_add,des_add,tcp_port,udp_port,log)
     print(firewall.configure_address())
-    firewall.configure_policy()
-    print(firewall.subnet_mask('23'))
+    print(firewall.configre_port())
+    print(firewall.configure_policy_modify('75','unselect'))

@@ -35,3 +35,33 @@ def forticli(request):
 
     else:
         return Response({'message': 'Only POST requests are allowed'}, status=400)
+    
+@api_view(['GET', 'POST'])  
+def forticli_modify(request):
+    if request.method == 'POST':
+        data = request.data  # 获取 JSON 格式的数据
+
+        # 从 JSON 数据中提取需要的字段
+        policy_id = data.get('policy_id')
+        select = data.get('select')
+        src_add = data.get('src_add')
+        des_add = data.get('des_add')
+        tcp_port = data.get('tcp_port')
+        udp_port = data.get('udp_port')
+
+        print(src_add, des_add, tcp_port, udp_port)
+
+        # 调用相应的方法进行处理
+        config = FirewallConfigurator('', '', '', src_add, des_add, tcp_port, udp_port, '')
+        result_command = config.configure_address() + config.configre_port() + config.configure_policy_modify(policy_id, select)
+        result_command_str = str(result_command)
+
+        data = {
+            'result': result_command_str,
+            'message': 'Success'
+        }
+
+        return Response(data)
+
+    else:
+        return Response({'message': 'Only POST requests are allowed'}, status=400)
