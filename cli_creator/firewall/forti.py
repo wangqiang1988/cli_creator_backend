@@ -42,6 +42,8 @@ class FirewallConfigurator:
                 subnet = "set subnet %s %s" % (i.split('/')[0],self.subnet_mask(i.split('/')[-1]))
                 next = "next"
                 command += edit + '\n' + subnet + '\n' + next + '\n'
+            elif i =="":
+                pass
             else:
                 edit = "edit %s/32" % i
                 subnet = "set subnet %s 255.255.255.255" % i
@@ -55,6 +57,8 @@ class FirewallConfigurator:
                 subnet = "set subnet %s %s" % (j.split('/')[0],self.subnet_mask(j.split('/')[-1]))
                 next = "next"
                 command += edit + '\n' + subnet + '\n' + next + '\n'
+            elif j =="":
+                pass
             else:
                 edit = "edit %s/32" % j
                 subnet = "set subnet %s 255.255.255.255" % j
@@ -95,6 +99,8 @@ class FirewallConfigurator:
                 src_address_str += "all"
             elif '/' in i:
                 src_address_str += i + " "
+            elif i =="":
+                pass
             else:
                 src_address_str += i + "/32 "
         for j in self.des_address.split(','):
@@ -147,6 +153,8 @@ class FirewallConfigurator:
                 src_address_str += "all"
             elif '/' in i:
                 src_address_str += i + " "
+            elif i =="":
+                pass
             else:
                 src_address_str += i + "/32 "
         for j in self.des_address.split(','):
