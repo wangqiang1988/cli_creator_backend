@@ -144,7 +144,7 @@ class FirewallConfigurator:
     
     def configure_policy_modify(self, policy_id, select):
         if policy_id == "":
-            pass
+            command = "config firewall policy\n"
         else:
             command = "config firewall policy\n" + "edit %s\n"% policy_id
         src_address_str = ""
