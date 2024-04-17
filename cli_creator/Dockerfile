@@ -10,6 +10,10 @@ ADD . /app
 # 安装项目依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 运行 Django 迁移命令
+RUN python manage.py makemigrations
+RUN python manage.py migrate
+
 # 暴露应用程序运行的端口
 EXPOSE 8080
 
