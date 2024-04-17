@@ -184,20 +184,20 @@ class FirewallConfigurator:
                 udp_port_str += "UDP-%s " %l
         if src_address_str != "":
             srcaddr = "%s srcaddr %s" % (select, src_address_str)
-            command += srcaddr
+            command += srcaddr + '\n'
         else:
             pass
         if des_address_str != "":
             dstaddr = "%s dstaddr %s" % (select, des_address_str)
-            command += dstaddr
+            command += dstaddr + '\n'
         else:
             pass
         if (tcp_port_str + udp_port_str) != "":
             service = "%s service %s" % (select, tcp_port_str + udp_port_str)
-            command += service
+            command += service + '\n'
         else:
             pass
-        end = "end"
+        end = "end" + '\n'
         command += end
         return command
 
