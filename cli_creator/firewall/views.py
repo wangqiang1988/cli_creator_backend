@@ -3,6 +3,28 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from firewall.forti import FirewallConfigurator
+from firewall.models import cli_logs
+from django.db.models import Count
+from datetime import datetime, timedelta
+
+@api_view(['GET']) 
+def logs_count(request):
+    if request.method == 'GET':
+        today = datetime.now().date()
+    # 计算昨天的日期
+        data_count_list=[]
+        for i in range(0, 7):
+    # 计算当前日期的前 i 天日期
+            date = today - timedelta(days=6-i)
+    
+    # 查询当天的数据量
+            data_count = cli_logs.objects.filter(time__date=date).count()
+    
+    # 打印结果
+            print(f"前{i}天的数据量：", data_count)
+            data_count_list.append(data_count)
+
+        return Response(data_count_list)
 
 @api_view(['GET', 'POST'])  
 def forticli(request):
@@ -30,8 +52,10 @@ def forticli(request):
             'result': result_command_str,
             'message': 'Success'
         }
-
+        obj = cli_logs(ip_address="127.0.0.1", time="2024-04-17", info="forticli_create")
+        obj.save()
         return Response(data)
+        
 
     else:
         return Response({'message': 'Only POST requests are allowed'}, status=400)
@@ -60,7 +84,8 @@ def forticli_modify(request):
             'result': result_command_str,
             'message': 'Success'
         }
-
+        obj = cli_logs(ip_address="127.0.0.1", time="2024-04-17", info="forticli_create")
+        obj.save()
         return Response(data)
 
     else:
