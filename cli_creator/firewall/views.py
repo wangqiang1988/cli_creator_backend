@@ -52,7 +52,8 @@ def forticli(request):
             'result': result_command_str,
             'message': 'Success'
         }
-        obj = cli_logs(ip_address="127.0.0.1", time="2024-04-17", info="forticli_create")
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        obj = cli_logs(ip_address="127.0.0.1", time=current_date, info="forticli_create")
         obj.save()
         return Response(data)
         
@@ -84,7 +85,8 @@ def forticli_modify(request):
             'result': result_command_str,
             'message': 'Success'
         }
-        obj = cli_logs(ip_address="127.0.0.1", time="2024-04-17", info="forticli_create")
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        obj = cli_logs(ip_address="127.0.0.1", time=current_date, info="forticli_modify")
         obj.save()
         return Response(data)
 
