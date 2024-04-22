@@ -7,6 +7,12 @@ from firewall.models import cli_logs
 from django.db.models import Count
 from datetime import datetime, timedelta
 
+
+
+def save_cli_logs(ip_address, time, info):
+    obj = cli_logs(ip_address=ip_address, time=time, info=info)
+    obj.save()
+
 @api_view(['GET']) 
 def logs_count(request):
     if request.method == 'GET':
@@ -30,8 +36,6 @@ def logs_count(request):
 def forticli(request):
     if request.method == 'POST':
         data = request.data  # 获取 JSON 格式的数据
-
-        # 从 JSON 数据中提取需要的字段
         name = data.get('name')
         src_if = data.get('src_if')
         des_if = data.get('des_if')
@@ -40,9 +44,7 @@ def forticli(request):
         tcp_port = data.get('tcp_port')
         udp_port = data.get('udp_port')
         log = data.get('log')
-
         print(name, src_if, des_if, src_add, des_add, tcp_port, udp_port, log)
-
         # 调用相应的方法进行处理
         config = FirewallConfigurator(name, src_if, des_if, src_add, des_add, tcp_port, udp_port, log)
         result_command = config.configure_address() + config.configre_port() + config.configure_policy()
@@ -53,8 +55,8 @@ def forticli(request):
             'message': 'Success'
         }
         current_date = datetime.now().strftime("%Y-%m-%d")
-        obj = cli_logs(ip_address="127.0.0.1", time=current_date, info="forticli_create")
-        obj.save()
+        log_info = "forticli_create"
+        save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
         return Response(data)
         
 
@@ -86,8 +88,8 @@ def forticli_modify(request):
             'message': 'Success'
         }
         current_date = datetime.now().strftime("%Y-%m-%d")
-        obj = cli_logs(ip_address="127.0.0.1", time=current_date, info="forticli_modify")
-        obj.save()
+        log_info = "forticli_modify"
+        save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
         return Response(data)
 
     else:
