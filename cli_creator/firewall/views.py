@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from firewall.forti import FirewallConfigurator
+from firewall.juniper import j_creat_policy
 from firewall.models import cli_logs
 from django.db.models import Count
 from datetime import datetime, timedelta
@@ -91,6 +92,37 @@ def forticli_modify(request):
         log_info = "forticli_modify"
         save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
         return Response(data)
+
+    else:
+        return Response({'message': 'Only POST requests are allowed'}, status=400)
+
+@api_view(['GET', 'POST'])  
+def juniper_policy_create(request):
+    if request.method == 'POST':
+        data = request.data  # 获取 JSON 格式的数据
+        name = data.get('name')
+        from_zone = data.get('from_zone')
+        to_zone = data.get('to_zone')
+        src_add = data.get('src_add')
+        des_add = data.get('des_add')
+        tcp_port = data.get('tcp_port')
+        udp_port = data.get('udp_port')
+        action = data.get('action')
+        log = data.get('log')
+        print(name, from_zone, to_zone, src_add, des_add, tcp_port, udp_port, log)
+        # 调用相应的方法进行处理
+        config = j_creat_policy(name, src_add, des_add, tcp_port, udp_port, from_zone, to_zone, action)
+        result_command_str = str(config)
+
+        data = {
+            'result': result_command_str,
+            'message': 'Success'
+        }
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        log_info = "juniper_create"
+        save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
+        return Response(data)
+        
 
     else:
         return Response({'message': 'Only POST requests are allowed'}, status=400)
