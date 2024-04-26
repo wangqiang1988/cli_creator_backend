@@ -45,3 +45,28 @@ def duplicates(request):
     else:
         return Response({'message': 'Only POST requests are allowed'}, status=400)
     
+@api_view(['GET', 'POST'])  
+def traversal(request):
+    if request.method == 'POST':
+        data = request.data  # 获取 JSON 格式的数据
+        text = data.get('text')
+        str = data.get('str')
+        result = ''
+        for line in text.splitlines():
+            for i in str.splitlines():
+                replaced_line = line.replace('$', i)
+                result += replaced_line + '\n'
+
+        data = {
+            'result': 'Success',
+            'message': result
+        }
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        log_info = "text_traversal"
+        save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
+        return Response(data)
+        
+
+    else:
+        return Response({'message': 'Only POST requests are allowed'}, status=400)
+    
