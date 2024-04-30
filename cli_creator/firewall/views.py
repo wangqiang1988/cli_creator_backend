@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from firewall.forti import FirewallConfigurator
 from firewall.juniper import j_creat_policy,j_address
-from firewall.models import cli_logs
+from firewall.models import cli_logs, foodlist
 from django.db.models import Count
 from datetime import datetime, timedelta
 
@@ -12,6 +12,11 @@ from datetime import datetime, timedelta
 
 def save_cli_logs(ip_address, time, info):
     obj = cli_logs(ip_address=ip_address, time=time, info=info)
+    obj.save()
+
+
+def food_add_log(userid, name, des, history, make, tips, time):
+    obj = foodlist(userid=userid, name=name, des=des, history=history, make=make, tips=tips, time=time)
     obj.save()
 
 @api_view(['GET']) 
@@ -148,3 +153,58 @@ def juniper_address_create(request):
 
     else:
         return Response({'message': 'Only POST requests are allowed'}, status=400)
+
+@api_view(['GET', 'POST'])  
+def food_add(request):
+    if request.method == 'POST':
+        data = request.data  # 获取 JSON 格式的数据
+        userid = data.get('userid')
+        name = data.get('name')
+        des = data.get('des')
+        history = data.get('history')
+        make = data.get('make')
+        tips = data.get('tips')
+
+        current_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        print(id, name, des, history, make, tips)
+        try:
+            food_add_log(userid, name, des, history, make, tips, current_date)
+        # 调用相应的方法进行处理
+            data = {
+                'result': '已提交',
+                'message': 'Success'
+            }
+            return Response(data)
+        except:
+            data = {
+                'result': '提交失败',
+                'message': 'Success'
+            }
+            return Response(data)
+        
+@api_view(['GET', 'POST'])  
+def print_foodlist(request):
+    # 获取foodlist模型的所有实例
+    if request.method == 'POST':
+        food_items = foodlist.objects.all()
+        content =""
+        
+    # 遍历所有实例并打印它们的数据
+        for food_item in food_items:
+            print("Userid:", food_item.userid)
+            print("Name:", food_item.name)
+            print("Description:", food_item.des)
+            print("History:", food_item.history)
+            print("Make:", food_item.make)
+            print("Tips:", food_item.tips)
+            print("Time:", food_item.time)
+            print("\n")  # 为了在输出中添加空行
+            content+= str(food_item.userid+'\n'+food_item.name +'\n'+ food_item.des +'\n' + food_item.history +'\n' + food_item.make + '\n' + food_item.tips + '\n' + str(food_item.time) + '\n')
+        
+        data ={
+            'result':content,
+            'message':'Success'
+            }
+
+    # 返回一个简单的 HTTP 响应，内容为 "Data printed"，也可以根据需要返回其他内容
+        return Response(data)
