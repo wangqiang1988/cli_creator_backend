@@ -79,7 +79,7 @@ def j_creat_policy(policyname, fromiplist, toiplist, tcpport, udpport, fromzone,
             elif '/' in toip:
                 toip = network_address(toip)
                 command += "set security address-book global address %s %s"%(toip,toip) + '\n'
-                command += "set security policies from-zone %s to-zone %s policy %s match source-address %s"%(fromzone,tozone,policyname,toip) + '\n'
+                command += "set security policies from-zone %s to-zone %s policy %s match destination-address %s"%(fromzone,tozone,policyname,toip) + '\n'
             else:
                 command += "set security address-book global address %s/32 %s/32"%(toip,toip) + '\n'
                 command += "set security policies from-zone %s to-zone %s policy %s match destination-address %s/32"%(fromzone,tozone,policyname,toip) + '\n'
