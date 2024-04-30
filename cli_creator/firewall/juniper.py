@@ -90,6 +90,33 @@ def j_creat_policy(policyname, fromiplist, toiplist, tcpport, udpport, fromzone,
     except:pass
     return command
 
+def j_address(address_list):
+    command = ""
+    if address_list: 
+        for address in address_list.split(','):
+            if '-' in address:
+                startip = address.split('-')[0]
+                endip = address.split('-')[-1]
+                startip_1 = startip.split('.')[0]
+                startip_2 = startip.split('.')[1]
+                startip_3 = startip.split('.')[2]
+                startip_4 = startip.split('.')[-1]
+                while True:
+                    startip_4 = str(startip_4)
+                    command += "set security address-book global address %s/32 %s/32"%((startip_1+'.'+startip_2+'.'+startip_3+'.'+startip_4),(startip_1+'.'+startip_2+'.'+startip_3+'.'+startip_4)) + '\n'
+                    startip_4 = int(startip_4)
+                    startip_4 += 1
+                    if int(startip_4) > int(endip.split('.')[-1]):
+                        break
+            elif '/' in address:
+                address = network_address(address)
+                command += "set security address-book global address %s %s"%(address,address) + '\n'
+            else:
+                command += "set security address-book global address %s/32 %s/32"%(address,address) + '\n'
+    else:pass
+    return command
+
+
 if __name__ =='__main__':
     policyname = 'test'
     fromiplist = '192.168.1.1'

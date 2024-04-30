@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from firewall.forti import FirewallConfigurator
-from firewall.juniper import j_creat_policy
+from firewall.juniper import j_creat_policy,j_address
 from firewall.models import cli_logs
 from django.db.models import Count
 from datetime import datetime, timedelta
@@ -120,6 +120,28 @@ def juniper_policy_create(request):
         }
         current_date = datetime.now().strftime("%Y-%m-%d")
         log_info = "juniper_create"
+        save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
+        return Response(data)
+        
+
+    else:
+        return Response({'message': 'Only POST requests are allowed'}, status=400)
+    
+@api_view(['GET', 'POST'])  
+def juniper_address_create(request):
+    if request.method == 'POST':
+        data = request.data  # 获取 JSON 格式的数据
+        address_list = data.get('address_list')
+        # 调用相应的方法进行处理
+        config = j_address(address_list)
+        result_command_str = str(config)
+
+        data = {
+            'result': result_command_str,
+            'message': 'Success'
+        }
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        log_info = "juniper_address_create"
         save_cli_logs(ip_address="127.0.0.1", time=current_date, info=log_info)
         return Response(data)
         
